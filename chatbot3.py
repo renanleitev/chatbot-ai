@@ -20,11 +20,11 @@ class Chatbot:
         # Área de texto
         self.text_area = ctk.CTkTextbox(master, width=700, height=400, wrap="word")
         self.text_area.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
-        self.text_area.insert(ctk.END, "Olá! Me informe o protocolo ou a data que você deseja consultar.\n")
+        self.text_area.insert(ctk.END, "Olá! Me informe o protocolo ou a data, hora que você deseja consultar.\n")
         self.text_area.configure(state="disabled")
 
         # Campo de entrada
-        self.entry = ctk.CTkEntry(master, width=500, placeholder_text="Digite o protocolo ou a data...")
+        self.entry = ctk.CTkEntry(master, width=500, placeholder_text="Digite o protocolo ou a data, hora...")
         self.entry.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
         self.entry.bind("<Return>", self.process_input)
 
@@ -49,6 +49,26 @@ class Chatbot:
 
         self.entry.delete(0, ctk.END)
 
+    def format_response(self, cells):
+        protocolo = cells[0].get_text().strip()
+        data_ocorrencia = cells[1].get_text().strip()
+        hora_ocorrencia = cells[2].get_text().strip()
+        natureza = cells[3].get_text().strip()
+        tipo = cells[13].get_text().strip()
+        situacao = cells[4].get_text().strip()
+        bairro = cells[5].get_text().strip()
+        endereco = cells[6].get_text().strip()
+        return "\n".join([
+            f"Protocolo: {protocolo}",
+            f"Data: {data_ocorrencia}",
+            f"Hora: {hora_ocorrencia}",
+            f"Natureza: {natureza}",
+            f"Tipo: {tipo}",
+            f"Situação: {situacao}",
+            f"Bairro: {bairro}",
+            f"Endereço: {endereco}",
+        ])
+
     def get_response(self, user_input):
         try:
             response = requests.get("https://docs.google.com/spreadsheets/d/e/2PACX-1vRcWiuMO_XIUBLdF-11eT8Y-8aaI17b7SwwPvK90yfnMjdTna32DOkXCqlmqe-ODXyoo5LqY0gYlrQx/pubhtml")
@@ -56,23 +76,29 @@ class Chatbot:
                 soup = BeautifulSoup(response.text, 'html.parser')
                 rows = soup.find_all('tr')
 
+                # Verificar se o input contém uma data e hora no formato 'data, hora'
+                if ',' in user_input:
+                    data, hora = user_input.split(',')
+                    data = data.strip()
+                    hora = hora.strip()
+
+                    for row in rows[1:]:
+                        cells = row.find_all('td')
+                        data_ocorrencia = cells[1].get_text().strip()
+                        hora_ocorrencia = cells[2].get_text().strip()
+
+                        if data == data_ocorrencia and hora == hora_ocorrencia:
+                            return self.format_response(cells)
+                
+                # Caso o input seja apenas protocolo
                 for row in rows[1:]:
                     cells = row.find_all('td')
                     protocolo = cells[0].get_text().strip()
-                    data = cells[1].get_text().strip()
 
-                    if user_input in [protocolo, data]:
-                        detalhes = "\n".join([
-                            f"Data: {data}",
-                            f"Hora: {cells[2].get_text().strip()}",
-                            f"Natureza: {cells[3].get_text().strip()}",
-                            f"Situação: {cells[4].get_text().strip()}",
-                            f"Bairro: {cells[5].get_text().strip()}",
-                            f"Endereço: {cells[6].get_text().strip()}",
-                        ])
-                        return detalhes
+                    if user_input.strip() == protocolo:
+                        return self.format_response(cells)
 
-                return "Dados não encontrados para o protocolo ou data especificados."
+                return "Dados não encontrados para o protocolo, data ou hora especificados."
             else:
                 return "Erro ao acessar a planilha."
         except requests.exceptions.RequestException as e:
