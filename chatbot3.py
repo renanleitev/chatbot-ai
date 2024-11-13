@@ -62,7 +62,6 @@ class Chatbot:
                     data = cells[1].get_text().strip()
 
                     if user_input in [protocolo, data]:
-                        # Retornar informações detalhadas
                         detalhes = "\n".join([
                             f"Data: {data}",
                             f"Hora: {cells[2].get_text().strip()}",
@@ -70,7 +69,6 @@ class Chatbot:
                             f"Situação: {cells[4].get_text().strip()}",
                             f"Bairro: {cells[5].get_text().strip()}",
                             f"Endereço: {cells[6].get_text().strip()}",
-                            # Adicione mais colunas conforme necessário
                         ])
                         return detalhes
 
