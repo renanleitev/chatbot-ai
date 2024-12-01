@@ -17,6 +17,16 @@ Base de Dados (Google Docs): https://docs.google.com/spreadsheets/d/e/2PACX-1vRc
 - **Tkinter**: Verifique se o Tkinter está instalado (e.g. `sudo apt install python3-tk`)
 - **Bibliotecas**: `customtkinter`, `requests`, `beautifulsoup4`, `pyinstaller`, `cx-Freeze`
 
+## Clonando o repositório
+
+Para obter a aplicação em seu computador, clone o repositório com o comando abaixo;
+
+    git clone https://github.com/renanleitev/chatbot-ai.git
+
+Depois, vá até a pasta que foi clonada:
+
+    cd chatbot-ai
+
 ## Configurando um ambiente virtual (opcional)
 
 Para instalar as dependências localmente, crie um ambiente virtual com o comando abaixo:
